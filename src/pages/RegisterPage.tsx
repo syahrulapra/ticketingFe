@@ -32,6 +32,9 @@ function Register() {
   const register = useRegister();
   const mutation = useMutation({
     mutationFn: (user: RegisterInput) => register(user),
+    onError: () => {
+      setIsSubmitting(false)
+    }
   });
 
   const handleSubmit = (evt: React.FormEvent<HTMLFormElement>) => {
@@ -87,6 +90,7 @@ function Register() {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Username"
+                  required
                 />
               </div>
 
@@ -109,6 +113,7 @@ function Register() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Email"
+                  required
                 />
               </div>
 
@@ -131,8 +136,10 @@ function Register() {
                 <input
                   type="password"
                   className="rounded-none rounded-e-lg bg-gray-50 border text-gray-900 block flex-1 min-w-0 w-full text-sm border-gray-300 p-2.5 outline-none placeholder:text-gray-500"
+                  value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Password"
+                  required
                 />
               </div>
               <button

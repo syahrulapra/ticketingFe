@@ -23,6 +23,9 @@ export function ModalCreationComponent({ onClose }: { onClose: () => void }) {
   const createTicket = useCreateTicket();
   const mutation = useMutation({
     mutationFn: (ticket: TicketInput) => createTicket(ticket),
+    onError: () => {
+      setIsSubmitting(false)
+    }
   });
 
   const handleSubmit = (evt: React.FormEvent<HTMLFormElement>) => {
@@ -60,6 +63,7 @@ export function ModalCreationComponent({ onClose }: { onClose: () => void }) {
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 placeholder="Masukan Subjek"
+                required
               />
             </div>
 
@@ -73,6 +77,7 @@ export function ModalCreationComponent({ onClose }: { onClose: () => void }) {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Masukan Pesan"
+                required
               />
             </div>
 
@@ -105,11 +110,8 @@ export function ModalCreationComponent({ onClose }: { onClose: () => void }) {
   );
 }
 
-export function ModalDetailComponent({
-  ticket,
-  onClose,
-}: {
-  ticket: Params["ticket"];
+export function ModalDetailComponent({ ticket, onClose }: { 
+  ticket: Params["ticket"]; 
   onClose: () => void;
 }) {
   const { data: ticketDetails, isLoading } = useDetailTicket(ticket);
@@ -127,8 +129,10 @@ export function ModalDetailComponent({
     ticketDetails && ticketDetails.ticketNumber
   );
   const mutation = useMutation({
-    mutationFn: (ticket: Omit<TicketInput, "subject" | "priority">) =>
-      createTicketAnswered(ticket),
+    mutationFn: (ticket: Omit<TicketInput, "subject" | "priority">) =>createTicketAnswered(ticket),
+    onError: () => {
+      setIsSubmitting(false)
+    }
   });
 
   const handleSubmit = (evt: React.FormEvent<HTMLFormElement>) => {
@@ -243,6 +247,7 @@ export function ModalDetailComponent({
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       placeholder="Masukan Pesan"
+                      required
                     />
                     <div className="flex gap-2 justify-end w-full">
                       <button
@@ -311,33 +316,11 @@ export function ModalDetailComponent({
   );
 }
 
-export function ModalDetailAnsweredComponent({
-  ticket,
-  onClose,
-}: {
-  ticket: Params["ticket"];
+export function ModalDetailAnsweredComponent({ ticket, onClose }: { 
+  ticket: Params["ticket"]; 
   onClose: () => void;
 }) {
-  const { data: detailTicketAnswered, isLoading } =
-    useDetailAnsweredTicket(ticket);
-
-  const createTicketAnswered = useCreateTicketAnswered(
-    detailTicketAnswered && detailTicketAnswered.ticketNumber
-  );
-  const mutation = useMutation({
-    mutationFn: (ticket: Omit<TicketInput, "subject" | "priority">) =>
-      createTicketAnswered(ticket),
-  });
-
-  if (mutation.isError) {
-    console.log(mutation.error.message);
-  }
-
-  if (mutation.isSuccess) {
-    console.log("Berhasil");
-    onClose();
-    window.location.reload();
-  }
+  const { data: detailTicketAnswered, isLoading } = useDetailAnsweredTicket(ticket);
 
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center">
@@ -358,7 +341,6 @@ export function ModalDetailAnsweredComponent({
             </div>
           </div>
         )}
-        {console.log(detailTicketAnswered && detailTicketAnswered.tickets)}
         {detailTicketAnswered && (
           <>
             <div className="grid grid-cols-2 gap-4">

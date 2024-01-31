@@ -11,9 +11,7 @@ export function useApi() {
   const { authUser } = useAuth()
   const token = authUser?.token || localStorage.getItem("access_token")
 
-  if (!token) {
-    console.log('No token found')
-  } else {
+  if (token) {
     localStorage.setItem("access_token", token)
   }
 

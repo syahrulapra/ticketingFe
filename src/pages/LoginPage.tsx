@@ -29,21 +29,24 @@ function Login() {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("")
 
   const login = useLogin();
   const mutation = useMutation({
     mutationFn: (user: LoginInput) => login(user),
+    onError: () => {
+      setIsSubmitting(false);
+      setMessage("Email atau Password Salah")
+    },
   });
 
   const handleSubmit = (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
-    setIsSubmitting(true);
-    mutation.mutate({ email, password });
+    if(!isSubmitting) {
+      setIsSubmitting(true);
+      mutation.mutate({ email, password });
+    }
   };
-
-  if (mutation.isError) {
-    console.log(mutation.error.message);
-  }
 
   if (mutation.isSuccess) {
     localStorage.setItem(
@@ -51,7 +54,6 @@ function Login() {
       JSON.stringify(mutation.data.data.token)
     );
     setAuthUser(mutation.data.data);
-    console.log(mutation.data.data);
     navigate({ to: "/dashboard/ticket" });
   }
 
@@ -88,34 +90,38 @@ function Login() {
                 <input
                   type="email"
                   className="rounded-none rounded-e-lg bg-gray-50 border text-gray-900 block flex-1 min-w-0 w-full text-sm border-gray-300 p-2.5 outline-none placeholder:text-gray-500"
-                  value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Email"
+                  required
                 />
               </div>
 
-              <div className="flex">
-                <span className="inline-flex items-center px-3 text-sm bg-blue-400 border rounded-e-0 border-blue-400 rounded-s-md">
-                  <svg
-                    className="w-5 h-5 text-white"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M8 10V7a4 4 0 1 1 8 0v3h1a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7c0-1.1.9-2 2-2h1Zm2-3a2 2 0 1 1 4 0v3h-4V7Zm2 6c.6 0 1 .4 1 1v3a1 1 0 1 1-2 0v-3c0-.6.4-1 1-1Z"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
-                </span>
-                <input
-                  type="password"
-                  className="rounded-none rounded-e-lg bg-gray-50 border text-gray-900 block flex-1 min-w-0 w-full text-sm border-gray-300 p-2.5 outline-none placeholder:text-gray-500"
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Password"
-                />
+              <div className="flex flex-col gap-1">
+                <div className="flex">
+                  <span className="inline-flex items-center px-3 text-sm bg-blue-400 border rounded-e-0 border-blue-400 rounded-s-md">
+                    <svg
+                      className="w-5 h-5 text-white"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        fill-rule="evenodd"
+                        d="M8 10V7a4 4 0 1 1 8 0v3h1a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7c0-1.1.9-2 2-2h1Zm2-3a2 2 0 1 1 4 0v3h-4V7Zm2 6c.6 0 1 .4 1 1v3a1 1 0 1 1-2 0v-3c0-.6.4-1 1-1Z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  </span>
+                  <input
+                    type="password"
+                    className="rounded-none rounded-e-lg bg-gray-50 border text-gray-900 block flex-1 min-w-0 w-full text-sm border-gray-300 p-2.5 outline-none placeholder:text-gray-500"
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Password"
+                    required
+                  />
+                </div>
+                {mutation.isError ? <p className="text-sm text-red-500 italic">{message}</p> : null}
               </div>
               <button
                 type="submit"
